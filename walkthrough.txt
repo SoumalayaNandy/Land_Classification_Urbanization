@@ -36,7 +36,7 @@ LANDCLASSIFICATION/
 │       └── 2022.shx               # Positional geometry index data
 │
 ├── notebooks/                     # Legacy development workspace
-│   └── finalproject.ipynb         # Deprecated/Reference notebook configuration
+│   └── finalproject.py            # Python file
 │
 ├── outputs/
 │   ├── 2016.html                  # Standalone interactive web map rendering (2016)
