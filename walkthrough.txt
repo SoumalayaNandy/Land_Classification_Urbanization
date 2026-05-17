@@ -1,0 +1,131 @@
+===============================================================================
+               KOLKATA LAND COVER CLASSIFICATION PIPELINE
+                            WALKTHROUGH GUIDE
+===============================================================================
+
+1. OVERVIEW
+-----------
+This repository provides a fully automated machine learning and geospatial data
+science workflow designed to map, validate, and analyze Land Use / Land Cover 
+(LULC) changes across the Kolkata metropolitan region. It handles multi-temporal
+analysis comparing urban expansion and environmental baselines between 2016 
+and 2022.
+
+The analytical backbone utilizes Google Earth Engine (GEE) to scale processing,
+building a Random Forest classifier (50 decision trees) trained dynamically on
+high-resolution ESA WorldCover labels to classify cloud-masked Landsat 8 TOA 
+imagery.
+
+
+2. PROJECT ARCHITECTURE & REPOSITORY DIRECTORY
+----------------------------------------------
+The repository layout is structured symmetrically to separate source assets, 
+standalone runtime code, output layers, and desktop integration environments:
+
+LANDCLASSIFICATION/
+│
+├── data/
+│   ├── raster/
+│   │   ├── Kolkata_LC_2016.tif    # 4-class GeoTIFF output (2016) [30m resolution]
+│   │   └── Kolkata_LC_2022.tif    # 4-class GeoTIFF output (2022) [30m resolution]
+│   │
+│   └── vector/
+│       ├── 2022.shp               # Shapefile geometry for region of interest
+│       ├── 2022.dbf               # Attribute classification indices
+│       ├── 2022.prj               # CRS & Projection tracking data (EPSG:4326)
+│       └── 2022.shx               # Positional geometry index data
+│
+├── notebooks/                     # Legacy development workspace
+│   └── finalproject.ipynb         # Deprecated/Reference notebook configuration
+│
+├── outputs/
+│   ├── 2016.html                  # Standalone interactive web map rendering (2016)
+│   ├── 2022.html                  # Standalone interactive web map rendering (2022)
+│   └── OUTPUT_HTML_FILE.html      # Consolidated comparative visual interface
+│
+├── .gitignore                     # Ignores runtime artifacts and active session cache
+├── finalproject.py                # STABLE RUNTIME EXECUTABLE ENGINE
+└── project.qgz                    # QGIS Desktop integration environment workspace
+
+
+3. INTERACTIVE RENDERING & CLASSIFICATION SCHEME
+------------------------------------------------
+The engine processes multi-spectral satellite imagery and maps target pixels into
+a normalized four-category discrete palette across both target periods:
+
+    ┌───────┬─────────────────┬───────────────────┐
+    │ Value │  Target Class   │ Hex Visual Color  │
+    ├───────┼─────────────────┼───────────────────┤
+    │   0   │   Vegetation    │ Green             │
+    │   1   │   Urban / Built │ Red               │
+    │   2   │   Bare Soil     │ Saddle Brown      │
+    │   3   │   Water Bodies  │ Blue              │
+    └───────┴─────────────────┴───────────────────┘
+
+
+4. COMPUTATIONAL PIPELINE STEPS
+-------------------------------
+When the processing engine executes, it routes data through five core stages:
+
+  STAGE 1: Environment Initialization & Spatial Context
+  • Authenticates your environment session and loads administrative boundary data 
+    from the FAO/GAUL global collection, filtering exclusively for 'Kolkata'.
+
+  STAGE 2: Automated Training Collection
+  • Remaps the ESA WorldCover benchmark array into our 4-class classification system.
+  • Spreads 1,500 random sample points inside the region boundary, capturing 
+    underlying truth classes to bypass manual training layout dependencies.
+
+  STAGE 3: Image Acquisition and Feature Engineering
+  • Filters Landsat 8 spatial targets across two distinct seasonal windows 
+    (Oct-Dec 2016 and Oct-Dec 2022).
+  • Implements a bitwise QA pixel channel filter to scrub cloud interference.
+  • Dynamically calculates the Normalized Difference Vegetation Index (NDVI) 
+    using Near-Infrared (Band 5) and Red (Band 4) arrays as a specialized band asset.
+
+  STAGE 4: Supervised Learning and Validation Cross-Checks
+  • Samples multi-spectral pixel arrays over the automated point fields.
+  • Applies a random column partition splitting vectors into 80% training arrays 
+    and 20% validation testing blocks.
+  • Trains a localized Random Forest model and cross-checks predictions against the 
+    validation split to dump a Confusion Matrix and Overall Accuracy telemetry score.
+
+  STAGE 5: Distribution & Local Integration
+  • Triggers background tasks exporting raw classified arrays as 8-bit GeoTIFF 
+    rasters to Google Drive.
+  • Saves localized, independent standalone Leaflet web map files under the 
+    outputs directory for immediate inline tracking.
+
+
+5. HOW TO ENVIRONMENT SETUP & EXECUTE (PYTHON ENGINE RAMP)
+----------------------------------------------------------
+Because the system is deployed as a consolidated standalone production script 
+(`finalproject.py`), you no longer run risky JSON notebook states that can pollute
+your git history with session metadata. Follow these execution instructions:
+
+A. Prerequisite Dependencies
+   Ensure your Python virtual environment is loaded and has the required spatial 
+   libraries installed:
+   $ pip install earthengine-api geemap rasterio numpy
+
+B. API Authentication
+   If this is your first time initializing Google Earth Engine on your machine, 
+   uncomment the following command inside `finalproject.py`:
+   ee.Authenticate()
+   
+   Execute the file once to complete the browser OAuth token handshake sequence. 
+   Once verified, comment the line back out to enable automated batch runs.
+
+C. Executing the System Core
+   To run the classification matrix, evaluate accuracy metrics, update visual layers, 
+   and initiate export processing, route execution through your shell:
+   $ python finalproject.py
+
+D. Desktop GIS Mapping Integration
+   • To visualize spatial outputs inside a production cartography layout, launch 
+     the workspace configuration file `project.qgz` using QGIS Desktop 3.x.
+   • The map canvas automatically integrates structural vector files from 
+     `data/vector/` and visualizes the generated classified layers inside 
+     `data/raster/` matching your palette standards.
+
+===============================================================================

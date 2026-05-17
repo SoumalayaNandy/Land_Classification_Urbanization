@@ -1,0 +1,24 @@
+# Ignore local QGIS statistics and cache files (DO NOT REMOVE THIS)
+*.aux.xml
+*.qgd
+*.lock
+*.qgz~
+
+# Ignore the legacy Jupyter Notebook and its background active session tracking
+finalproject.ipynb
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+.virtual_documents/
+
+# Ignore Python runtime artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.venv/
+venv/
+
+# Ignore OS junk
+.DS_Store
+Thumbs.db
