@@ -31,7 +31,7 @@ LANDCLASSIFICATION/
 │       └── 2022.shx               # Positional index format
 │
 ├── notebooks/
-│   └── finalproject.ipynb         # Pipeline engine for processing, area calculations, and export logic
+│   └── finalproject.py         # Pipeline engine for processing, area calculations, and export logic
 │
 ├── outputs/
 │   ├── 2016.html                  # Interactive standalone web visualization map (2016)
